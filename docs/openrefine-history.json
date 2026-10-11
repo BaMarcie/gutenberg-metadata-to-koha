@@ -1,0 +1,137 @@
+[
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Title",
+    "expression": "grel:value.replace(\"\\n\", \" : \").trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Title using expression grel:value.replace(\"\\n\", \" : \").trim()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Title",
+    "expression": "grel:value.replace(\" : \", \": \")",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Title using expression grel:value.replace(\" : \", \": \")"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Authors",
+    "expression": "grel:filter(value.split(\"; \"), v, not(v.contains(\"[\"))).join(\"||\")",
+    "onError": "set-to-blank",
+    "newColumnName": "dc.creator",
+    "columnInsertIndex": 6,
+    "description": "Create column dc.creator at index 6 based on column Authors using expression grel:filter(value.split(\"; \"), v, not(v.contains(\"[\"))).join(\"||\")"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "list",
+          "name": "dc.creator",
+          "expression": "isBlank(value)",
+          "columnName": "dc.creator",
+          "invert": false,
+          "omitBlank": false,
+          "omitError": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectBlank": false,
+          "selectError": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "dc.creator",
+    "expression": "grel:with(filter(cells[\"Authors\"].value.split(\"; \"), v, or(v.contains(\"[Editor]\"), v.contains(\"[Compiler]\"))), a, if(a.length() > 0, a[0].replace(/\\s*\\[.*\\]$/, \"\"), \"\"))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column dc.creator using expression grel:with(filter(cells[\"Authors\"].value.split(\"; \"), v, or(v.contains(\"[Editor]\"), v.contains(\"[Compiler]\"))), a, if(a.length() > 0, a[0].replace(/\\s*\\[.*\\]$/, \"\"), \"\"))"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Authors",
+    "expression": "grel:join(filter(cells[\"Authors\"].value.split(\"; \"), v, and(v.contains(\"[\"), v.replace(/\\s*\\[.*\\]$/, \"\") != cells[\"dc.creator\"].value)), \"||\")",
+    "onError": "set-to-blank",
+    "newColumnName": "dc.contributor",
+    "columnInsertIndex": 6,
+    "description": "Create column dc.contributor at index 6 based on column Authors using expression grel:join(filter(cells[\"Authors\"].value.split(\"; \"), v, and(v.contains(\"[\"), v.replace(/\\s*\\[.*\\]$/, \"\") != cells[\"dc.creator\"].value)), \"||\")"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Subjects",
+    "expression": "grel:value.replace(\"; \", \"||\")",
+    "onError": "set-to-blank",
+    "newColumnName": "dc.subject",
+    "columnInsertIndex": 9,
+    "description": "Create column dc.subject at index 9 based on column Subjects using expression grel:value.replace(\"; \", \"||\")"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Language",
+    "expression": "grel:value.replace(\"; \", \"||\")",
+    "onError": "set-to-blank",
+    "newColumnName": "dc.language",
+    "columnInsertIndex": 5,
+    "description": "Create column dc.language at index 5 based on column Language using expression grel:value.replace(\"; \", \"||\")"
+  },
+  {
+    "op": "core/column-rename",
+    "oldColumnName": "Title",
+    "newColumnName": "dc.title",
+    "description": "Rename column Title to dc.title"
+  },
+  {
+    "op": "core/column-rename",
+    "oldColumnName": "Issued",
+    "newColumnName": "dcterms.issued",
+    "description": "Rename column Issued to dcterms.issued"
+  },
+  {
+    "op": "core/column-rename",
+    "oldColumnName": "Type",
+    "newColumnName": "dc.type",
+    "description": "Rename column Type to dc.type"
+  },
+  {
+    "op": "core/column-rename",
+    "oldColumnName": "Text#",
+    "newColumnName": "dc.identifier",
+    "description": "Rename column Text# to dc.identifier"
+  }
+]
